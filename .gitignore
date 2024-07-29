@@ -1,0 +1,11 @@
+__pycache__/
+.vscode/
+.venv/
+*.pth
+*.npz
+*.npy
+/slurm-*.out
+
+.idea/
+.DS_Store
+swap/

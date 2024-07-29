@@ -1,0 +1,538 @@
+{
+  "$defs": {
+    "ArchCfg_DaniFormer": {
+      "properties": {
+        "type": {
+          "const": "daniformer",
+          "default": "daniformer",
+          "enum": [
+            "daniformer"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "transformer_depth": {
+          "default": 6,
+          "title": "Transformer Depth",
+          "type": "integer"
+        },
+        "embed_dim": {
+          "default": 384,
+          "title": "Embed Dim",
+          "type": "integer"
+        },
+        "patch_size": {
+          "default": 8,
+          "title": "Patch Size",
+          "type": "integer"
+        },
+        "use_semantics": {
+          "default": false,
+          "title": "Use Semantics",
+          "type": "boolean"
+        },
+        "use_masks": {
+          "default": false,
+          "title": "Use Masks",
+          "type": "boolean"
+        },
+        "bg_ratio_strategy": {
+          "default": "total",
+          "enum": [
+            "total",
+            "indiv",
+            "sum1",
+            "onoff"
+          ],
+          "title": "Bg Ratio Strategy",
+          "type": "string"
+        },
+        "concat_mask": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "const": "ignore",
+              "enum": [
+                "ignore"
+              ],
+              "type": "string"
+            }
+          ],
+          "default": false,
+          "title": "Concat Mask"
+        },
+        "norm_tokens": {
+          "default": false,
+          "title": "Norm Tokens",
+          "type": "boolean"
+        },
+        "use_patch_tokens_for_node": {
+          "default": false,
+          "title": "Use Patch Tokens For Node",
+          "type": "boolean"
+        },
+        "encode_coords": {
+          "default": false,
+          "title": "Encode Coords",
+          "type": "boolean"
+        },
+        "classification_token": {
+          "default": true,
+          "title": "Classification Token",
+          "type": "boolean"
+        }
+      },
+      "title": "ArchCfg_DaniFormer",
+      "type": "object"
+    },
+    "DataCfg": {
+      "properties": {
+        "source": {
+          "default": "psg",
+          "enum": [
+            "psg",
+            "o365",
+            "vg-ietrans",
+            "psg-coco"
+          ],
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "title": "DataCfg",
+      "type": "object"
+    },
+    "ExtractorCfg_ConvNeXt": {
+      "properties": {
+        "type": {
+          "const": "convnext",
+          "default": "convnext",
+          "enum": [
+            "convnext"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "large.fb_in22k_ft_in1k_384",
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "title": "ExtractorCfg_ConvNeXt",
+      "type": "object"
+    },
+    "ExtractorCfg_Dinov2": {
+      "properties": {
+        "type": {
+          "const": "dinov2",
+          "default": "dinov2",
+          "enum": [
+            "dinov2"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "s",
+          "enum": [
+            "s",
+            "b",
+            "l",
+            "g"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "title": "ExtractorCfg_Dinov2",
+      "type": "object"
+    },
+    "ExtractorCfg_FasterRCNN": {
+      "properties": {
+        "type": {
+          "const": "fasterrcnn",
+          "default": "fasterrcnn",
+          "enum": [
+            "fasterrcnn"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "stage": {
+          "default": "0",
+          "enum": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "all"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "backbone": {
+          "default": "resnet50",
+          "enum": [
+            "resnet50",
+            "mobilenet"
+          ],
+          "title": "Backbone",
+          "type": "string"
+        }
+      },
+      "title": "ExtractorCfg_FasterRCNN",
+      "type": "object"
+    },
+    "ExtractorCfg_HRNet": {
+      "properties": {
+        "type": {
+          "const": "hrnet",
+          "default": "hrnet",
+          "enum": [
+            "hrnet"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "const": "w32",
+          "default": "w32",
+          "enum": [
+            "w32"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "title": "ExtractorCfg_HRNet",
+      "type": "object"
+    },
+    "ExtractorCfg_Mask2Former": {
+      "properties": {
+        "type": {
+          "const": "mask2former",
+          "default": "mask2former",
+          "enum": [
+            "mask2former"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "checkpoint": {
+          "default": "facebook/mask2former-swin-base-coco-panoptic",
+          "title": "Checkpoint",
+          "type": "string"
+        },
+        "features": {
+          "default": "encoder",
+          "enum": [
+            "encoder",
+            "decoder",
+            "decoder_merged"
+          ],
+          "title": "Features",
+          "type": "string"
+        }
+      },
+      "title": "ExtractorCfg_Mask2Former",
+      "type": "object"
+    },
+    "ExtractorCfg_ResNet": {
+      "properties": {
+        "type": {
+          "const": "resnet",
+          "default": "resnet",
+          "enum": [
+            "resnet"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "name": {
+          "default": "resnet101",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "title": "ExtractorCfg_ResNet",
+      "type": "object"
+    },
+    "LRScheduleStep": {
+      "properties": {
+        "type": {
+          "const": "step",
+          "default": "step",
+          "enum": [
+            "step"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "step_size": {
+          "default": 10,
+          "title": "Step Size",
+          "type": "integer"
+        },
+        "factor": {
+          "default": 0.1,
+          "title": "Factor",
+          "type": "number"
+        }
+      },
+      "title": "LRScheduleStep",
+      "type": "object"
+    },
+    "LossCfg": {
+      "properties": {
+        "rank_weight": {
+          "default": 0.0,
+          "title": "Rank Weight",
+          "type": "number"
+        },
+        "interpolate_weights": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interpolate Weights"
+        }
+      },
+      "title": "LossCfg",
+      "type": "object"
+    },
+    "_Augmentations": {
+      "properties": {
+        "train": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Train",
+          "type": "array"
+        },
+        "val": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Val",
+          "type": "array"
+        }
+      },
+      "required": [
+        "train",
+        "val"
+      ],
+      "title": "_Augmentations",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "rel_weight": {
+      "default": 0.8,
+      "title": "Rel Weight",
+      "type": "number"
+    },
+    "node_loss_weight": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Node Loss Weight"
+    },
+    "batch_size": {
+      "default": 32,
+      "title": "Batch Size",
+      "type": "integer"
+    },
+    "rels_per_batch": {
+      "default": 4096,
+      "title": "Rels Per Batch",
+      "type": "integer"
+    },
+    "lr": {
+      "default": 0.001,
+      "title": "Lr",
+      "type": "number"
+    },
+    "lr_backbone": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lr Backbone"
+    },
+    "lr_schedule": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LRScheduleStep"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "weight_decay": {
+      "default": 0.01,
+      "title": "Weight Decay",
+      "type": "number"
+    },
+    "neg_ratio": {
+      "default": 1.0,
+      "title": "Neg Ratio",
+      "type": "number"
+    },
+    "augmentations": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/_Augmentations"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "single_rel_data": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Single Rel Data"
+    },
+    "allow_overlapping_negatives": {
+      "default": true,
+      "title": "Allow Overlapping Negatives",
+      "type": "boolean"
+    },
+    "log_rel_class_weights": {
+      "default": false,
+      "title": "Log Rel Class Weights",
+      "type": "boolean"
+    },
+    "grad_accumulate": {
+      "default": 1,
+      "title": "Grad Accumulate",
+      "type": "integer"
+    },
+    "loss": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LossCfg"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "extractor": {
+      "default": {
+        "type": "fasterrcnn",
+        "stage": "0",
+        "backbone": "resnet50"
+      },
+      "discriminator": {
+        "mapping": {
+          "convnext": "#/$defs/ExtractorCfg_ConvNeXt",
+          "dinov2": "#/$defs/ExtractorCfg_Dinov2",
+          "fasterrcnn": "#/$defs/ExtractorCfg_FasterRCNN",
+          "hrnet": "#/$defs/ExtractorCfg_HRNet",
+          "mask2former": "#/$defs/ExtractorCfg_Mask2Former",
+          "resnet": "#/$defs/ExtractorCfg_ResNet"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ExtractorCfg_FasterRCNN"
+        },
+        {
+          "$ref": "#/$defs/ExtractorCfg_Mask2Former"
+        },
+        {
+          "$ref": "#/$defs/ExtractorCfg_Dinov2"
+        },
+        {
+          "$ref": "#/$defs/ExtractorCfg_HRNet"
+        },
+        {
+          "$ref": "#/$defs/ExtractorCfg_ConvNeXt"
+        },
+        {
+          "$ref": "#/$defs/ExtractorCfg_ResNet"
+        }
+      ],
+      "title": "Extractor"
+    },
+    "architecture": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ArchCfg_DaniFormer"
+        }
+      ],
+      "default": {
+        "type": "daniformer",
+        "transformer_depth": 6,
+        "embed_dim": 384,
+        "patch_size": 8,
+        "use_semantics": false,
+        "use_masks": false,
+        "bg_ratio_strategy": "total",
+        "concat_mask": false,
+        "norm_tokens": false,
+        "use_patch_tokens_for_node": false,
+        "encode_coords": false,
+        "classification_token": true
+      }
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/DataCfg"
+        }
+      ],
+      "default": {
+        "source": "psg"
+      }
+    }
+  },
+  "title": "Config",
+  "type": "object"
+}
