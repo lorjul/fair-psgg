@@ -1,6 +1,8 @@
-# Fair PSGG
+# A Fair Ranking and New Model for Panoptic Scene Graph Generation
 
-We are currently preparing this repo for the camera ready version. The current code may still contain some rough edges.
+**We are currently preparing this repo for the camera ready version. The current code may still contain some rough edges.**
+
+This is the official implementation of our paper "A Fair Ranking and New Model for Panoptic Scene Graph Generation", accepted at ECCV 2024. For more information, please visit the [project page](https://lorjul.github.io/fair-psgg/).
 
 ## Setup
 
@@ -27,4 +29,20 @@ To train a model, use the following code:
 poetry shell
 # run the training command
 python -m fair_psgg --help
+```
+
+## Citation
+
+If you found our paper or code helpful, please consider citing it:
+
+``` bibtex
+@misc{lorenz2024fairpsgg,
+    title={A Fair Ranking and New Model for Panoptic Scene Graph Generation}, 
+    author={Julian Lorenz and Alexander Pest and Daniel Kienzle and Katja Ludwig and Rainer Lienhart},
+    year={2024},
+    eprint={2407.09216},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV},
+    url={https://arxiv.org/abs/2407.09216}, 
+}
 ```
