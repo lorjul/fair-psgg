@@ -1,5 +1,7 @@
 # Fair PSGG
 
+We are currently preparing this repo for the camera ready version. The current code may still contain some rough edges.
+
 ## Setup
 
 ### Environment
