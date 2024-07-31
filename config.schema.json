@@ -415,18 +415,6 @@
       ],
       "default": null
     },
-    "single_rel_data": {
-      "anyOf": [
-        {
-          "type": "integer"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Single Rel Data"
-    },
     "allow_overlapping_negatives": {
       "default": true,
       "title": "Allow Overlapping Negatives",

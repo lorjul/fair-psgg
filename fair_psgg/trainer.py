@@ -7,7 +7,6 @@ from torch.utils.tensorboard import SummaryWriter
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
 
-from .data.single_rel_data import get_single_rel_loader
 from .data.data import get_rel_loader
 from .data.split_batch import split_batch_iter
 from .metrics import build_rel_metrics_dict
@@ -80,7 +79,6 @@ class Trainer:
         self.imgs_per_batch = config.batch_size
         self.rels_per_batch = config.rels_per_batch
 
-        self.use_single_rel_data = config.single_rel_data is not None
         self._setup_loaders(config, anno_path, img_dir, seg_dir, num_workers)
 
         self.model = from_config.get_model(
@@ -174,34 +172,19 @@ class Trainer:
         val_entries, node_names, rel_names = from_config.get_data_entries(
             config, anno_path=anno_path, split="val"
         )
-        if config.single_rel_data is None:
-            self.train_loader = get_rel_loader(
-                entries=train_entries,
-                node_names=node_names,
-                rel_names=rel_names,
-                img_dir=img_dir,
-                seg_dir=seg_dir,
-                is_train=True,
-                batch_size=self.imgs_per_batch,
-                num_workers=num_workers,
-                augmentations=from_config.get_augmentations(config, split="train"),
-                neg_ratio=config.neg_ratio,
-                allow_overlapping_negatives=config.allow_overlapping_negatives,
-            )
-        else:
-            self.train_loader = get_single_rel_loader(
-                entries=train_entries,
-                node_names=node_names,
-                rel_names=rel_names,
-                img_dir=img_dir,
-                seg_dir=seg_dir,
-                is_train=True,
-                batch_size=config.single_rel_data,
-                num_workers=num_workers,
-                augmentations=from_config.get_augmentations(config, split="train"),
-                neg_ratio=config.neg_ratio,
-                allow_overlapping_negatives=config.allow_overlapping_negatives,
-            )
+        self.train_loader = get_rel_loader(
+            entries=train_entries,
+            node_names=node_names,
+            rel_names=rel_names,
+            img_dir=img_dir,
+            seg_dir=seg_dir,
+            is_train=True,
+            batch_size=self.imgs_per_batch,
+            num_workers=num_workers,
+            augmentations=from_config.get_augmentations(config, split="train"),
+            neg_ratio=config.neg_ratio,
+            allow_overlapping_negatives=config.allow_overlapping_negatives,
+        )
 
         self.val_loader = get_rel_loader(
             entries=val_entries,
@@ -411,11 +394,10 @@ class Trainer:
             dynamic_ncols=True,
             disable=self.hide_batch_progress,
         )
-        if not self.use_single_rel_data:
-            batch_iterator = split_batch_iter(
-                batch_iterator,
-                max_relations=self.rels_per_batch,
-            )
+        batch_iterator = split_batch_iter(
+            batch_iterator,
+            max_relations=self.rels_per_batch,
+        )
 
         # update criterion weights if desired
         if self._rel_loss_w_interpolate is not None:

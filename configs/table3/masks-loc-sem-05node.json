@@ -10,7 +10,6 @@
     "weight_decay": 0.04,
     "neg_ratio": 1.0,
     "augmentations": null,
-    "single_rel_data": null,
     "extractor": {
         "type": "fasterrcnn",
         "stage": "0"
