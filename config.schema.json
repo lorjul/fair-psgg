@@ -327,16 +327,9 @@
       "type": "number"
     },
     "node_loss_weight": {
-      "anyOf": [
-        {
-          "type": "number"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Node Loss Weight"
+      "default": 0.2,
+      "title": "Node Loss Weight",
+      "type": "number"
     },
     "batch_size": {
       "default": 32,

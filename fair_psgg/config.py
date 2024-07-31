@@ -77,7 +77,7 @@ class LRScheduleStep(BaseModel):
 
 class Config(BaseModel):
     rel_weight: float = 0.8
-    node_loss_weight: Optional[float] = None
+    node_loss_weight: float = 0.2
     batch_size: int = 32
     rels_per_batch: int = 4096
     lr: float = 0.001
@@ -105,15 +105,11 @@ class Config(BaseModel):
     data: DataCfg = DataCfg()
 
     def get_loss_weights(self):
-        if self.node_loss_weight is None:
-            n = 1 - self.rel_weight
-        else:
-            n = self.node_loss_weight
         if self.loss is None:
             rank_weight = 0.0
         else:
             rank_weight = self.loss.rank_weight
-        return self.rel_weight, n, rank_weight
+        return self.rel_weight, self.node_loss_weight, rank_weight
 
     def to_markdown(self):
         lines = [f"- {key}: {value}" for key, value in self.__dict__.items()]
