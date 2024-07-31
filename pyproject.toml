@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "multilabel-baseline"
-version = "0.1.0"
+name = "fair-psgg"
+version = "1.0.0"
 description = ""
 authors = ["Julian Lorenz <julian.lorenz@uni-a.de>"]
 license = "MIT"
@@ -15,17 +15,11 @@ tqdm = "^4.66.1"
 scikit-learn = "^1.3.2"
 tensorboard = "^2.15.1"
 pydantic = "^2.5.2"
-matplotlib = "^3.8.2"
 transformers = "^4.35.2"
 timm = "^0.9.12"
 h5py = "^3.10.0"
-pandas = "^2.2.0"
 panopticapi = {git = "https://github.com/cocodataset/panopticapi.git"}
 
-
-[tool.poetry.group.dev.dependencies]
-ipykernel = "^6.27.1"
-ipywidgets = "^8.1.1"
 
 [build-system]
 requires = ["poetry-core"]
