@@ -1,11 +1,10 @@
 [tool.poetry]
 name = "fair-psgg"
 version = "1.0.0"
-description = ""
+description = "Official implementation of our paper 'A Fair Ranking and New Model for Panoptic Scene Graph Generation', accepted at ECCV 2024"
 authors = ["Julian Lorenz <julian.lorenz@uni-a.de>"]
 license = "MIT"
 readme = "README.md"
-package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -21,6 +20,8 @@ h5py = "^3.10.0"
 panopticapi = {git = "https://github.com/cocodataset/panopticapi.git"}
 numpy = "<2"
 
+[tool.poetry.scripts]
+fair-psgg = "fair_psgg.__main__:cli"
 
 [build-system]
 requires = ["poetry-core"]

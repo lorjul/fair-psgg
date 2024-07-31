@@ -14,7 +14,7 @@ Alternatively, you can use pip to install the different packages manually. Howev
 
 ### Data
 
-<!--https://entuedu-my.sharepoint.com/:f:/g/personal/jingkang001_e_ntu_edu_sg/EgQzvsYo3t9BpxgMZ6VHaEMBDAb7v0UgI8iIAExQUJq62Q?e=fIY3zh-->
+<!-- direct link: https://entuedu-my.sharepoint.com/:f:/g/personal/jingkang001_e_ntu_edu_sg/EgQzvsYo3t9BpxgMZ6VHaEMBDAb7v0UgI8iIAExQUJq62Q?e=fIY3zh -->
 
 Download the PSG datasets from [here](https://github.com/Jingkang50/OpenPSG?tab=readme-ov-file#updates) and extract them.
 
@@ -27,9 +27,19 @@ To train a model, use the following code:
 ``` sh
 # first, activate the environment (if not done)
 poetry shell
-# run the training command
-python -m fair_psgg --help
+# then, run the training command
+fair-psgg \
+    --anno /path/to/psg/psg/psg.json \
+    --img /path/to/psg/coco \
+    --seg /path/to/psg/coco \
+    --epochs 40 \
+    ./configs/table2/masks-loc-sem.json \
+    /output/path/masks-loc-sem
 ```
+
+For more information, run `fair-psgg --help`.
+
+The provided config files are grouped by the supplementary tables.
 
 ## Citation
 
