@@ -19,6 +19,7 @@ transformers = "^4.35.2"
 timm = "^0.9.12"
 h5py = "^3.10.0"
 panopticapi = {git = "https://github.com/cocodataset/panopticapi.git"}
+numpy = "<2"
 
 
 [build-system]
