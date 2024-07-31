@@ -9,13 +9,22 @@ from .utils import detect_task_spooler
 
 def cli():
     parser = ArgumentParser()
-    parser.add_argument("config")
-    parser.add_argument("output")
-    parser.add_argument("--anno", default=None)
-    parser.add_argument("--img", default=None)
-    parser.add_argument("--seg", default=None)
-    parser.add_argument("--epochs", default=40, type=int)
-    parser.add_argument("--workers", default=12, type=int)
+    parser.add_argument("config", help="Path to config file")
+    parser.add_argument(
+        "output",
+        help="Path to output folder. Note that all contents inside that folder will be overwritten",
+    )
+    parser.add_argument("--anno", default=None, help="Path to PSG JSON annotation file")
+    parser.add_argument("--img", default=None, help="Directory that contains images")
+    parser.add_argument(
+        "--seg", default=None, help="Directory that contains segmentation masks"
+    )
+    parser.add_argument(
+        "--epochs", default=40, type=int, help="Number of training epochs"
+    )
+    parser.add_argument(
+        "--workers", default=12, type=int, help="Number of workers for the data loaders"
+    )
     parser.add_argument("--model-state", default=None)
     parser.add_argument("--no-bpbar", default=False, action="store_true")
     args = parser.parse_args()
