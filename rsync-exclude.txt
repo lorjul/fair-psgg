@@ -1,0 +1,14 @@
+__pycache__
+.pytest_cache
+.idea
+.vscode
+.git
+.venv
+results
+*.sqlite
+.DS_Store
+notebooks
+playground
+rsync-exclude.txt
+*.npy
+*.pth
