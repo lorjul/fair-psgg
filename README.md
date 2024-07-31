@@ -41,6 +41,18 @@ For more information, run `fair-psgg --help`.
 
 The provided config files are grouped by the supplementary tables.
 
+### Inference
+
+``` sh
+poetry shell
+python -m fair_psgg.tasks.inference \
+    /path/to/psg/psg/psg.json \
+    /path/to/psg/coco \
+    /path/to/psg/coco \
+    /path/to/model/output/folder \
+    --split test
+```
+
 ## Citation
 
 If you found our paper or code helpful, please consider citing it:
