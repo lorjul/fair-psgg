@@ -36,22 +36,6 @@
           "title": "Bg Ratio Strategy",
           "type": "string"
         },
-        "concat_mask": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "const": "ignore",
-              "enum": [
-                "ignore"
-              ],
-              "type": "string"
-            }
-          ],
-          "default": false,
-          "title": "Concat Mask"
-        },
         "norm_tokens": {
           "default": false,
           "title": "Norm Tokens",
@@ -491,7 +475,6 @@
         "use_semantics": false,
         "use_masks": false,
         "bg_ratio_strategy": "sum",
-        "concat_mask": false,
         "norm_tokens": false,
         "use_patch_tokens_for_node": false,
         "encode_coords": false,

@@ -21,7 +21,6 @@
         "use_semantics": false,
         "use_masks": false,
         "bg_ratio_strategy": "sum",
-        "concat_mask": false,
         "classification_token": true,
         "encode_coords": true,
         "norm_tokens": true,

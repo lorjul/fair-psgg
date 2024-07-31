@@ -4,12 +4,7 @@ from typing import Tuple
 import torch
 import torch.nn as nn
 
-from .building_blocks import (
-    AddSbjObjTokens,
-    ConcatSbjObjTokens,
-    IgnoreSbjObjTokens,
-    CoordEncoder,
-)
+from .building_blocks import CoordEncoder
 from .feature_extractors import FeatureExtractor
 from .transformer_blocks import TransformerBlock, make_sine_position_encoding
 from .frequency_bias import FreqBias
@@ -220,7 +215,6 @@ class DaniFormer(nn.Module):
         use_semantics=False,
         use_masks=False,
         bg_ratio_strategy="total",
-        concat_mask=False,
         encode_coords=False,
         normalize_tokens=False,
         use_patch_tokens_for_node=False,
@@ -281,14 +275,6 @@ class DaniFormer(nn.Module):
             ),
             requires_grad=False,
         )
-
-        # how should we combine the mask tokens and the patch tokens?
-        if concat_mask == "ignore":
-            self.combine_mask = IgnoreSbjObjTokens()
-        elif concat_mask:
-            self.combine_mask = ConcatSbjObjTokens(self.embed_dim)
-        else:
-            self.combine_mask = AddSbjObjTokens()
 
         if self.use_masks:
             self.sbjobj_encoder = SbjObjMaskEncoder(
@@ -382,14 +368,7 @@ class DaniFormer(nn.Module):
             )
             extra_tokens = torch.cat((extra_tokens, coord_token[:, None]), dim=1)
 
-        tokens = torch.cat(
-            (
-                extra_tokens,
-                # combine is either simply adding or a concat, followed by a single linear layer
-                self.combine_mask(patches_per_box, sbjobj_tokens),
-            ),
-            dim=1,
-        )
+        tokens = torch.cat((extra_tokens, patches_per_box + sbjobj_tokens), dim=1)
         # OR: add the tokens after every layer
 
         if return_attention is not None:

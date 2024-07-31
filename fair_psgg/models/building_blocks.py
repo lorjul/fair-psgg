@@ -4,25 +4,6 @@ import torch
 import torch.nn as nn
 
 
-class AddSbjObjTokens(nn.Module):
-    def forward(self, patch_tokens, sbjobj_tokens):
-        return patch_tokens + sbjobj_tokens
-
-
-class IgnoreSbjObjTokens(nn.Module):
-    def forward(self, patch_tokens, sbjobj_tokens):
-        return patch_tokens
-
-
-class ConcatSbjObjTokens(nn.Module):
-    def __init__(self, embed_dim: int):
-        super().__init__()
-        self.lin = nn.Linear(in_features=embed_dim * 2, out_features=embed_dim)
-
-    def forward(self, patch_tokens, sbjobj_tokens):
-        return self.lin(torch.cat((patch_tokens, sbjobj_tokens), dim=2))
-
-
 def norm_coords(coords: torch.Tensor, height_width):
     """Normalises coords to [-1, +1]"""
     h, w = height_width
