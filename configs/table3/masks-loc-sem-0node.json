@@ -1,0 +1,35 @@
+{
+    "rel_weight": 1.0,
+    "node_loss_weight": 0.0,
+    "loss": {
+        "rank_weight": 0.4
+    },
+    "batch_size": 32,
+    "rels_per_batch": 128,
+    "lr": 3.73e-05,
+    "weight_decay": 0.04,
+    "neg_ratio": 1.0,
+    "augmentations": null,
+    "single_rel_data": null,
+    "extractor": {
+        "type": "fasterrcnn",
+        "stage": "0"
+    },
+    "architecture": {
+        "type": "daniformer",
+        "transformer_depth": 6,
+        "embed_dim": 384,
+        "patch_size": 8,
+        "use_semantics": true,
+        "use_masks": true,
+        "bg_ratio_strategy": "sum1",
+        "concat_mask": false,
+        "classification_token": true,
+        "encode_coords": true,
+        "norm_tokens": true,
+        "use_patch_tokens_for_node": false
+    },
+    "data": {
+        "source": "psg"
+    }
+}
