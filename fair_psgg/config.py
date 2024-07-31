@@ -48,7 +48,6 @@ class _Augmentations(BaseModel):
 
 
 class ArchCfg_DaniFormer(BaseModel):
-    type: Literal["daniformer"] = "daniformer"
     transformer_depth: int = 6
     embed_dim: int = 384
     patch_size: int = 8

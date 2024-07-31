@@ -2,15 +2,6 @@
   "$defs": {
     "ArchCfg_DaniFormer": {
       "properties": {
-        "type": {
-          "const": "daniformer",
-          "default": "daniformer",
-          "enum": [
-            "daniformer"
-          ],
-          "title": "Type",
-          "type": "string"
-        },
         "transformer_depth": {
           "default": 6,
           "title": "Transformer Depth",
@@ -508,7 +499,6 @@
         }
       ],
       "default": {
-        "type": "daniformer",
         "transformer_depth": 6,
         "embed_dim": 384,
         "patch_size": 8,

@@ -16,7 +16,6 @@
         "stage": "0"
     },
     "architecture": {
-        "type": "daniformer",
         "transformer_depth": 6,
         "embed_dim": 256,
         "patch_size": 8,
