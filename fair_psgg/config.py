@@ -53,7 +53,7 @@ class ArchCfg_DaniFormer(BaseModel):
     patch_size: int = 8
     use_semantics: bool = False
     use_masks: bool = False
-    bg_ratio_strategy: Literal["total", "indiv", "sum1", "onoff"] = "total"
+    bg_ratio_strategy: Literal["sum", "onoff"] = "sum"
     concat_mask: Union[bool, Literal["ignore"]] = False
     norm_tokens: bool = False
     use_patch_tokens_for_node: bool = False

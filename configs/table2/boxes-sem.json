@@ -20,7 +20,7 @@
         "patch_size": 8,
         "use_semantics": true,
         "use_masks": false,
-        "bg_ratio_strategy": "sum1",
+        "bg_ratio_strategy": "sum",
         "concat_mask": false,
         "classification_token": true,
         "encode_coords": false,

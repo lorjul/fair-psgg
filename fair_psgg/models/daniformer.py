@@ -24,26 +24,18 @@ def bg_ratio_total_rest(sbj_ratios, obj_ratios):
     return torch.max(torch.tensor(0.0), 1 - sbj_ratios - obj_ratios)
 
 
-def bg_ratio_indiv_rest(sbj_ratios, obj_ratios):
-    return 0.5 * (2 - sbj_ratios - obj_ratios)
-
-
-def bg_ratio_sum1_rest(sbj_ratios, obj_ratios):
-    return 1 - sbj_ratios - obj_ratios
-
-
 class SbjObjBoxEncoder(nn.Module):
     def __init__(
         self,
         embed_dim: int,
         patch_size: int,
         img_size: Tuple[int, int],
-        bg_ratio_strategy,
+        bg_ratio_strategy: str,
         bg_token=True,
         normalize_tokens=False,
     ):
         super().__init__()
-        assert bg_ratio_strategy in ("total", "indiv", "sum1")
+        assert bg_ratio_strategy in ("sum", "onoff")
         self.normalize_tokens = normalize_tokens
         self.patch_size = patch_size
         self.sbj_token = nn.Parameter(torch.rand(embed_dim))
@@ -54,12 +46,8 @@ class SbjObjBoxEncoder(nn.Module):
             self.background_token = nn.Parameter(
                 torch.zeros(embed_dim), requires_grad=False
             )
-        if bg_ratio_strategy == "total":
+        if bg_ratio_strategy == "sum":
             self.get_bg_ratio = bg_ratio_total_rest
-        elif bg_ratio_strategy == "indiv":
-            self.get_bg_ratio = bg_ratio_indiv_rest
-        elif bg_ratio_strategy == "sum1":
-            self.get_bg_ratio = bg_ratio_sum1_rest
         elif bg_ratio_strategy == "onoff":
             self.get_bg_ratio = bg_ratio_onoff_rest
         else:
@@ -118,11 +106,12 @@ class SbjObjMaskEncoder(nn.Module):
         self,
         embed_dim: int,
         patch_size: int,
-        bg_ratio_strategy,
+        bg_ratio_strategy: str,
         bg_token=True,
         normalize_tokens=False,
     ):
         super().__init__()
+        assert bg_ratio_strategy in ("sum", "onoff")
         self.normalize_tokens = normalize_tokens
         self.patch_size = patch_size
         self.sbj_token = nn.Parameter(torch.rand(embed_dim))
@@ -134,15 +123,10 @@ class SbjObjMaskEncoder(nn.Module):
                 torch.zeros(embed_dim), requires_grad=False
             )
 
-        if bg_ratio_strategy == "total":
+        if bg_ratio_strategy == "sum":
             self.get_bg_ratio = bg_ratio_total_rest
-        elif bg_ratio_strategy == "indiv":
-            self.get_bg_ratio = bg_ratio_indiv_rest
         elif bg_ratio_strategy == "onoff":
             self.get_bg_ratio = bg_ratio_onoff_rest
-        elif bg_ratio_strategy == "sum1":
-            self.get_bg_ratio = bg_ratio_sum1_rest
-            self.get_bg_ratio = bg_ratio_indiv_rest
         else:
             raise ValueError()
 
