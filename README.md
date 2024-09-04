@@ -20,6 +20,8 @@ Download the PSG datasets from [here](https://github.com/Jingkang50/OpenPSG?tab=
 
 ## Usage
 
+Each of the listed scripts in this section have a `--help` option for more information.
+
 ### Training
 
 To train a model, use the following code:
@@ -29,9 +31,9 @@ To train a model, use the following code:
 poetry shell
 # then, run the training command
 fair-psgg \
-    --anno /path/to/psg/psg/psg.json \
-    --img /path/to/psg/coco \
-    --seg /path/to/psg/coco \
+    --anno /path/to/openpsg/psg/psg.json \
+    --img /path/to/openpsg/coco \
+    --seg /path/to/openpsg/coco \
     --epochs 40 \
     ./configs/table2/masks-loc-sem.json \
     /output/path/masks-loc-sem
@@ -41,16 +43,102 @@ For more information, run `fair-psgg --help`.
 
 The provided config files are grouped by the supplementary tables.
 
-### Inference
+### Inference (PredCls)
+
+Run the following to produce an output file using a trained DSFormer model:
 
 ``` sh
 poetry shell
 python -m fair_psgg.tasks.inference \
-    /path/to/psg/psg/psg.json \
-    /path/to/psg/coco \
-    /path/to/psg/coco \
+    /path/to/openpsg/psg/psg.json \
+    /path/to/openpsg/coco \
+    /path/to/openpsg/coco \
     /path/to/model/output/folder \
+    /tmp/results-file.pkl \
     --split test
+```
+
+Note that this script does not evaluate the model, but only produces an output file. To evaluate that output file, use the following script:
+
+``` sh
+python scripts/evaluate.py \
+    /path/to/openpsg/psg/psg.json \
+    /tmp/results-file.pkl \
+    /tmp/metrics.csv \
+    --seg /path/to/openpsg/coco \
+    --dedup fail
+```
+
+### Inference Without Ground Truth Masks
+
+We show that a good segmentation model improves performance considerably. To reproduce our results, you first need to obtain the inferred segmentation masks.
+
+In this section, we use the following shell variables for better readability:
+
+``` sh
+# the path to the folder that contains the psg and coco folders
+OPENPSG_DIR=/path/to/openpsg
+# output path, where inferred segmentation masks will be written to by a segmentation model
+INFMASK_DIR=/path/to/inferred_masks
+```
+
+``` sh
+# example for OneFormer
+python scripts/infer_segmasks.py \
+    "$OPENPSG_DIR/coco/val2017" \
+    "$INFMASK_DIR/val2017" \
+    "$OPENPSG_DIR/psg/psg.json" \
+    --model shi-labs/oneformer_coco_swin_large
+```
+
+This will write segmentation masks for each image in the provided image directory (first command line argument).
+
+We have testsed the following values for the `--model` option:
+
+- shi-labs/oneformer_coco_swin_large
+- facebook/maskformer-swin-tiny-coco
+- facebook/maskformer-swin-large-coco
+- facebook/mask2former-swin-large-coco-panoptic
+
+Next, match the generated output masks to the PSG annotations:
+
+``` sh
+python scripts/match_psg.py --enforce-rel \
+    "$OPENPSG_DIR/psg/psg.json" \
+    "$INFMASK_DIR/val2017/anno.json" \
+    "$INFMASK_DIR/val2017/matched.json"
+```
+
+If you are interested, you can show some stats about the matching by running the following:
+
+``` sh
+python scripts/get_match_stats.py \
+    "$OPENPSG_DIR/psg/psg.json" \
+    "$INFMASK_DIR/val2017/matched.json"
+```
+
+Now, you have a new annotation file that can be used with DSFormer. Run inference as shown above in the Usage section. DSFormer will produce a results file that can be evaluated using the following script:
+
+``` sh
+# run inference
+# replace /path/to/trained/model/folder with an actual path to a trained DSFormer model folder
+# DSFormer model folders usually contain a config.json and a last_state.pth
+python -m fair_psgg.tasks.inference \
+    "$INFMASK_DIR/val2017/matched.json" \
+    "$OPENPSG_DIR/coco" \
+    "$INFMASK_DIR" \
+    /path/to/trained/model/folder \
+    /tmp/results-file.pkl \
+    --workers 12 \
+    --split test
+
+# evaluate results file
+python scripts/evaluate.py \
+    "$OPENPSG_DIR/psg/psg.json" \
+    /tmp/results-file.pkl \
+    /tmp/metrics.csv \
+    --seg "$OPENPSG_DIR/coco" \
+    --dedup fail
 ```
 
 ## Citation

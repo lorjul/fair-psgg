@@ -129,21 +129,37 @@ def inference2(
 
 
 def cli():
-    parser = ArgumentParser()
-    parser.add_argument("anno")
-    parser.add_argument("img")
-    parser.add_argument("seg")
+    parser = ArgumentParser(
+        description="Given a trained DSFormer model, runs inference on a given dataset. "
+        "Note that this script only runs inference and does not evaluate the resulting file. "
+        "Check the README for more information."
+    )
+    parser.add_argument("anno", help="Path to OpenPSG annotation file")
+    parser.add_argument("img", help="Folder that contains images")
+    parser.add_argument("seg", help="Folder that contains segmentation masks")
     parser.add_argument(
         "model",
         help="Path to model folder that contains config.json and best_state.pth",
     )
-    parser.add_argument("output")
-    parser.add_argument("--bs", default=32, type=int, help="Default: 32")
-    parser.add_argument("--workers", default=0, type=int, help="Default: 0")
+    parser.add_argument(
+        "output", help="Output file where the inference results should be written to"
+    )
+    parser.add_argument("--bs", default=32, type=int, help="Batch size. Default: 32")
+    parser.add_argument(
+        "--workers",
+        default=0,
+        type=int,
+        help="Number of workers for the data loader. Default: 0",
+    )
     parser.add_argument(
         "--split", default="all", choices=("all", "val", "test", "train")
     )
-    parser.add_argument("--no-sigmoid", default=False, action="store_true")
+    parser.add_argument(
+        "--no-sigmoid",
+        default=False,
+        action="store_true",
+        help="Don't apply sigmoid to the model outputs",
+    )
     args = parser.parse_args()
 
     if not Path(args.model).is_dir():
