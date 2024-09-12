@@ -36,11 +36,6 @@
           "title": "Bg Ratio Strategy",
           "type": "string"
         },
-        "norm_tokens": {
-          "default": false,
-          "title": "Norm Tokens",
-          "type": "boolean"
-        },
         "use_patch_tokens_for_node": {
           "default": false,
           "title": "Use Patch Tokens For Node",
@@ -468,7 +463,6 @@
         "use_semantics": false,
         "use_masks": false,
         "bg_ratio_strategy": "sum",
-        "norm_tokens": false,
         "use_patch_tokens_for_node": false,
         "encode_coords": false,
         "classification_token": true

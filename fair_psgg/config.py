@@ -54,7 +54,6 @@ class ArchCfg_DaniFormer(BaseModel):
     use_semantics: bool = False
     use_masks: bool = False
     bg_ratio_strategy: Literal["sum", "onoff"] = "sum"
-    norm_tokens: bool = False
     use_patch_tokens_for_node: bool = False
     encode_coords: bool = False
     classification_token: bool = True

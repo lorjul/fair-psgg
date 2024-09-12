@@ -23,7 +23,6 @@
         "bg_ratio_strategy": "sum",
         "classification_token": true,
         "encode_coords": true,
-        "norm_tokens": true,
         "use_patch_tokens_for_node": false
     },
     "data": {

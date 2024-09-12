@@ -3,6 +3,7 @@
 from typing import Tuple
 import torch
 import torch.nn as nn
+from torch.nn.functional import normalize
 
 from .building_blocks import CoordEncoder
 from .feature_extractors import FeatureExtractor
@@ -27,11 +28,9 @@ class SbjObjBoxEncoder(nn.Module):
         img_size: Tuple[int, int],
         bg_ratio_strategy: str,
         bg_token=True,
-        normalize_tokens=False,
     ):
         super().__init__()
         assert bg_ratio_strategy in ("sum", "onoff")
-        self.normalize_tokens = normalize_tokens
         self.patch_size = patch_size
         self.sbj_token = nn.Parameter(torch.rand(embed_dim))
         self.obj_token = nn.Parameter(torch.rand(embed_dim))
@@ -51,11 +50,6 @@ class SbjObjBoxEncoder(nn.Module):
         self.onoff = bg_ratio_strategy == "onoff"
 
         self.patch_coords = self.get_patch_boxes(img_size).reshape(-1, 4)
-
-    def norm_tkn(self, v: torch.Tensor):
-        if self.normalize_tokens:
-            return v / v.norm()
-        return v
 
     def get_patch_boxes(self, img_size):
         rows, cols = torch.meshgrid(
@@ -90,9 +84,9 @@ class SbjObjBoxEncoder(nn.Module):
             obj_ratios[obj_ratios > 0] = 1
             bg_ratios[:] = 0.0
         return (
-            bg_ratios[..., None] * self.norm_tkn(self.background_token[None, None])
-            + sbj_ratios[..., None] * self.norm_tkn(self.sbj_token[None, None])
-            + obj_ratios[..., None] * self.norm_tkn(self.obj_token[None, None])
+            bg_ratios[..., None] * normalize(self.background_token, dim=0)[None, None]
+            + sbj_ratios[..., None] * normalize(self.sbj_token, dim=0)[None, None]
+            + obj_ratios[..., None] * normalize(self.obj_token, dim=0)[None, None]
         )
 
 
@@ -103,11 +97,9 @@ class SbjObjMaskEncoder(nn.Module):
         patch_size: int,
         bg_ratio_strategy: str,
         bg_token=True,
-        normalize_tokens=False,
     ):
         super().__init__()
         assert bg_ratio_strategy in ("sum", "onoff")
-        self.normalize_tokens = normalize_tokens
         self.patch_size = patch_size
         self.sbj_token = nn.Parameter(torch.rand(embed_dim))
         self.obj_token = nn.Parameter(torch.rand(embed_dim))
@@ -126,11 +118,6 @@ class SbjObjMaskEncoder(nn.Module):
             raise ValueError()
 
         self.onoff = bg_ratio_strategy == "onoff"
-
-    def norm_tkn(self, v: torch.Tensor):
-        if self.normalize_tokens:
-            return v / v.norm()
-        return v
 
     def forward_ratios(
         self,
@@ -173,9 +160,9 @@ class SbjObjMaskEncoder(nn.Module):
             obj_ratios[obj_ratios > 0] = 1
             bg_ratios[:] = 0.0
         return (
-            bg_ratios[..., None] * self.norm_tkn(self.background_token[None, None])
-            + sbj_ratios[..., None] * self.norm_tkn(self.sbj_token[None, None])
-            + obj_ratios[..., None] * self.norm_tkn(self.obj_token[None, None])
+            bg_ratios[..., None] * normalize(self.background_token, dim=0)[None, None]
+            + sbj_ratios[..., None] * normalize(self.sbj_token, dim=0)[None, None]
+            + obj_ratios[..., None] * normalize(self.obj_token, dim=0)[None, None]
         )
 
 
@@ -216,7 +203,6 @@ class DaniFormer(nn.Module):
         use_masks=False,
         bg_ratio_strategy="total",
         encode_coords=False,
-        normalize_tokens=False,
         use_patch_tokens_for_node=False,
         use_classification_token=True,
     ):
@@ -282,7 +268,6 @@ class DaniFormer(nn.Module):
                 patch_size=patch_size,
                 bg_ratio_strategy=bg_ratio_strategy,
                 bg_token=True,
-                normalize_tokens=normalize_tokens,
             )
         else:
             self.sbjobj_encoder = SbjObjBoxEncoder(
@@ -291,7 +276,6 @@ class DaniFormer(nn.Module):
                 feature_shape[1:],
                 bg_ratio_strategy=bg_ratio_strategy,
                 bg_token=True,
-                normalize_tokens=normalize_tokens,
             )
 
         if encode_coords:
