@@ -166,28 +166,6 @@ class SbjObjMaskEncoder(nn.Module):
         )
 
 
-class NodeClassifierPatchTokens(nn.Module):
-    def __init__(self, embed_dim: int, num_node_outputs: int, num_patches: int):
-        super().__init__()
-        self.conv1x1 = nn.Conv1d(in_channels=embed_dim, out_channels=1, kernel_size=1)
-        self.linear = nn.Linear(in_features=num_patches, out_features=num_node_outputs)
-
-    def forward(self, tokens: torch.Tensor, ratios):
-        _, sbj_ratios, obj_ratios = ratios
-        patch_tokens = tokens[:, -sbj_ratios.size(1) :]
-        sbj_tokens = self.conv1x1(
-            (patch_tokens * sbj_ratios[..., None]).transpose(1, 2)
-        )
-        obj_tokens = self.conv1x1(
-            (patch_tokens * obj_ratios[..., None]).transpose(1, 2)
-        )
-
-        sbj_cls = self.linear(sbj_tokens[:, 0])
-        obj_cls = self.linear(obj_tokens[:, 0])
-
-        return sbj_cls, obj_cls
-
-
 class DaniFormer(nn.Module):
     def __init__(
         self,
@@ -203,7 +181,6 @@ class DaniFormer(nn.Module):
         use_masks=False,
         bg_ratio_strategy="total",
         encode_coords=False,
-        use_patch_tokens_for_node=False,
         use_classification_token=True,
     ):
         super().__init__()
@@ -243,17 +220,9 @@ class DaniFormer(nn.Module):
             nn.Linear(in_features=final_hidden_dim, out_features=num_rel_outputs - 1),
         )
 
-        if use_patch_tokens_for_node:
-            self.final_node = NodeClassifierPatchTokens(
-                embed_dim=self.embed_dim,
-                num_node_outputs=num_node_outputs,
-                num_patches=(self.feature_shape[1] // patch_size)
-                * (self.feature_shape[2] // patch_size),
-            )
-        else:
-            self.final_node = nn.Linear(
-                in_features=self.embed_dim, out_features=num_node_outputs * 2
-            )
+        self.final_node = nn.Linear(
+            in_features=self.embed_dim, out_features=num_node_outputs * 2
+        )
 
         self.pos_encoding = nn.Parameter(
             make_sine_position_encoding(
@@ -380,13 +349,6 @@ class DaniFormer(nn.Module):
             # this is for inference only, safe some memory and skip the node classification
             sbj_cls = None
             obj_cls = None
-        elif isinstance(self.final_node, NodeClassifierPatchTokens):
-            sbj_cls, obj_cls = self.final_node(
-                tokens,
-                self.sbjobj_encoder.forward_ratios(
-                    seg[sbj_ids], seg[obj_ids], features.shape[-2:]
-                ),
-            )
         else:
             node_output = self.final_node(final_token)
             half_len = node_output.size(1) // 2

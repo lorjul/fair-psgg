@@ -22,8 +22,7 @@
         "use_masks": false,
         "bg_ratio_strategy": "sum",
         "classification_token": true,
-        "encode_coords": true,
-        "use_patch_tokens_for_node": false
+        "encode_coords": true
     },
     "data": {
         "source": "psg"
