@@ -62,10 +62,6 @@ class DataCfg(BaseModel):
     source: Literal["psg", "o365", "vg-ietrans", "psg-coco"] = "psg"
 
 
-class LossCfg(BaseModel):
-    interpolate_weights: Optional[int] = None
-
-
 class LRScheduleStep(BaseModel):
     type: Literal["step"] = "step"
     step_size: int = 10
@@ -87,7 +83,6 @@ class Config(BaseModel):
     allow_overlapping_negatives: bool = True
     log_rel_class_weights: bool = False
     grad_accumulate: int = 1
-    loss: Optional[LossCfg] = None
 
     extractor: Union[
         ExtractorCfg_FasterRCNN,

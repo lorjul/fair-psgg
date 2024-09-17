@@ -155,11 +155,6 @@ class Trainer:
 
         self.hide_batch_progress = hide_batch_progress
 
-        if config.loss is None:
-            self._rel_loss_w_interpolate = None
-        else:
-            self._rel_loss_w_interpolate = config.loss.interpolate_weights
-
     def _setup_loaders(self, config: Config, anno_path, img_dir, seg_dir, num_workers):
         train_entries, node_names, rel_names = from_config.get_data_entries(
             config, anno_path=anno_path, split="train"
@@ -364,12 +359,6 @@ class Trainer:
             batch_iterator,
             max_relations=self.rels_per_batch,
         )
-
-        # update criterion weights if desired
-        if self._rel_loss_w_interpolate is not None:
-            self.rel_criterion.interpol_weights(
-                min(1, epoch / self._rel_loss_w_interpolate)
-            )
 
         self.optimizer.zero_grad()
         for bi, batch in enumerate(batch_iterator):

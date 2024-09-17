@@ -248,24 +248,6 @@
       "title": "LRScheduleStep",
       "type": "object"
     },
-    "LossCfg": {
-      "properties": {
-        "interpolate_weights": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Interpolate Weights"
-        }
-      },
-      "title": "LossCfg",
-      "type": "object"
-    },
     "_Augmentations": {
       "properties": {
         "train": {
@@ -389,17 +371,6 @@
       "default": 1,
       "title": "Grad Accumulate",
       "type": "integer"
-    },
-    "loss": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/LossCfg"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null
     },
     "extractor": {
       "default": {

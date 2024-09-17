@@ -19,27 +19,7 @@ def get_multi_rel_criterion(pos_neg_ratios: torch.Tensor, log=False):
     # pos_weights = inv / inv.mean()
     pos_weights = inv
     assert (pos_weights >= 0).all()
-    return BCEWithLogitsLossInterpolate(pos_weight=pos_weights)
-
-
-class BCEWithLogitsLossInterpolate(nn.BCEWithLogitsLoss):
-    def __init__(
-        self,
-        weight: Tensor | None = None,
-        size_average=None,
-        reduce=None,
-        reduction: str = "mean",
-        pos_weight: Tensor | None = None,
-    ) -> None:
-        super().__init__(weight, size_average, reduce, reduction, pos_weight)
-        self._final_pos_weight = self.pos_weight
-
-    def interpol_weights(self, t: float):
-        t = max(0, min(1, t))
-        self.pos_weight = (
-            (1 - t) * torch.ones_like(self._final_pos_weight)
-            + t * self._final_pos_weight
-        ).to(self.pos_weight.device)
+    return nn.BCEWithLogitsLoss(pos_weight=pos_weights)
 
 
 class BCEWithLogitsIgnoreNegative(nn.BCEWithLogitsLoss):
