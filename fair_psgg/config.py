@@ -63,7 +63,6 @@ class DataCfg(BaseModel):
 
 
 class LossCfg(BaseModel):
-    rank_weight: float = 0.0
     interpolate_weights: Optional[int] = None
 
 
@@ -103,11 +102,7 @@ class Config(BaseModel):
     data: DataCfg = DataCfg()
 
     def get_loss_weights(self):
-        if self.loss is None:
-            rank_weight = 0.0
-        else:
-            rank_weight = self.loss.rank_weight
-        return self.rel_weight, self.node_loss_weight, rank_weight
+        return self.rel_weight, self.node_loss_weight
 
     def to_markdown(self):
         lines = [f"- {key}: {value}" for key, value in self.__dict__.items()]

@@ -1,9 +1,6 @@
 {
     "rel_weight": 0.82,
     "node_loss_weight": 0.18,
-    "loss": {
-        "rank_weight": 0.4
-    },
     "batch_size": 32,
     "rels_per_batch": 128,
     "lr": 3.73e-05,

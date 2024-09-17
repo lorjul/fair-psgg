@@ -13,7 +13,7 @@ from .metrics import build_rel_metrics_dict
 from .config import Config
 from . import from_config
 from .utils import get_device, get_git_changes, get_git_commit
-from .loss import RelRankLoss, get_node_criterion, get_multi_rel_criterion
+from .loss import get_node_criterion, get_multi_rel_criterion
 
 
 class NoTensorboard:
@@ -100,11 +100,6 @@ class Trainer:
             # only divide by log(number of classes)
             log=config.log_rel_class_weights,
         ).to(self.device)
-
-        if config.loss is not None and config.loss.rank_weight > 0:
-            self.rank_criterion = RelRankLoss()
-        else:
-            self.rank_criterion = None
 
         if config.lr_backbone is None:
             self.optimizer = optim.AdamW(
@@ -201,24 +196,14 @@ class Trainer:
         )
 
     def _common_forward(self, batch):
-        rel_loss_weight, node_loss_weight, rank_loss_weight = self.loss_weights
+        rel_loss_weight, node_loss_weight = self.loss_weights
 
         model_input, sbj_target, obj_target, rel_target = prepare_batch(
             batch, self.device
         )
 
         model_out = self.model(model_input)
-        if len(model_out) == 3:
-            sbj_out, obj_out, rel_out = model_out
-            # use dummy value for rel_ranking:
-            # ranking has no NONE class
-            rel_ranking = torch.zeros(
-                (rel_out.size(0), rel_out.size(1) - 1),
-                dtype=rel_out.dtype,
-                device=rel_out.device,
-            )
-        else:
-            sbj_out, obj_out, rel_out, rel_ranking = model_out
+        sbj_out, obj_out, rel_out = model_out
 
         # node loss
         sbj_loss = self.node_criterion(sbj_out, sbj_target)
@@ -230,19 +215,11 @@ class Trainer:
             rel_out, rel_target.to(self.device)
         )
 
-        # rel rank loss
         img_ids = torch.repeat_interleave(
             torch.arange(len(batch["img"])), batch["num_relations"]
         )
-        if self.rank_criterion is not None:
-            # watch out: default value for rank_loss_weight is 0
-            rank_loss = rank_loss_weight * self.rank_criterion(
-                rel_ranking, rel_target[:, 1:].to(self.device), img_ids
-            )
-        else:
-            rank_loss = torch.tensor(0.0)
 
-        loss = node_loss + rel_loss + rank_loss
+        loss = node_loss + rel_loss
 
         if torch.isnan(loss):
             if self.out_dir is not None:
@@ -254,7 +231,6 @@ class Trainer:
                         "rel_tgt": rel_target,
                         "sbj_tgt": sbj_target,
                         "obj_tgt": obj_target,
-                        "rel_rank": rel_ranking,
                         "img_ids": img_ids,
                     },
                     self.out_dir / "dbg-nanloss.pth",
@@ -265,14 +241,12 @@ class Trainer:
             "loss": loss,
             "node_loss": node_loss.detach().cpu().clone(),
             "rel_loss": rel_loss.detach().cpu().clone(),
-            "rank_loss": rank_loss.detach().cpu().clone(),
             "sbj_target": sbj_target,
             "obj_target": obj_target,
             "sbj_out": sbj_out,
             "obj_out": obj_out,
             "rel_target": rel_target,
             "rel_out": rel_out,
-            "rank_out": rel_ranking,
         }
 
     @torch.inference_mode()
@@ -282,7 +256,6 @@ class Trainer:
         node_losses = []
         rel_losses = []
         final_losses = []
-        rank_losses = []
 
         # torch.cat is required at the end
         # it can also be the case that some images appear twice in the list
@@ -291,7 +264,6 @@ class Trainer:
 
         all_rel_targets = defaultdict(list)
         all_rel_outputs = defaultdict(list)
-        all_rank_outputs = defaultdict(list)
 
         batch_iterator = split_batch_iter(
             tqdm(
@@ -318,17 +290,14 @@ class Trainer:
             )
             cpu_rel_target = fwd["rel_target"].cpu().clone()
             cpu_rel_out = fwd["rel_out"].sigmoid().cpu().clone()
-            cpu_rank_out = fwd["rank_out"].cpu().clone()
             for i in range(len(batch["img"])):
                 raw_img_id = batch["image_id"][i].item()
                 all_rel_targets[raw_img_id].append(cpu_rel_target[img_ids == i])
                 all_rel_outputs[raw_img_id].append(cpu_rel_out[img_ids == i])
-                all_rank_outputs[raw_img_id].append(cpu_rank_out[img_ids == i])
 
             final_losses.append(fwd["loss"].cpu().clone())
             node_losses.append(fwd["node_loss"])
             rel_losses.append(fwd["rel_loss"])
-            rank_losses.append(fwd["rank_loss"])
 
         # calculate per class accuracy
         all_node_targets = torch.cat(all_node_targets)
@@ -347,7 +316,6 @@ class Trainer:
         all_img_ids = list(all_rel_targets.keys())
         all_rel_targets = _merge(all_img_ids, all_rel_targets)
         all_rel_outputs = _merge(all_img_ids, all_rel_outputs)
-        all_rank_outputs = _merge(all_img_ids, all_rank_outputs)
         per_class_node_acc = confusion_matrix(
             all_node_targets,
             all_node_outputs,
@@ -358,7 +326,6 @@ class Trainer:
             "epoch_loss/val/sum": torch.tensor(final_losses).mean().item(),
             "epoch_loss/val/node": torch.tensor(node_losses).mean().item(),
             "epoch_loss/val/rel": torch.tensor(rel_losses).mean().item(),
-            "epoch_loss/val/rank": torch.tensor(rank_losses).mean().item(),
             "node_acc/mean": float(per_class_node_acc.mean()),
         }
 
@@ -378,7 +345,6 @@ class Trainer:
             "node_outputs": all_node_outputs,
             "rel_targets": all_rel_targets,
             "rel_outputs": all_rel_outputs,
-            "rel_ranks": all_rank_outputs,
             "rel_img_ids": all_img_ids,
         }
 
@@ -420,7 +386,7 @@ class Trainer:
                 loss.detach().cpu().item() * self.grad_accumulate,
                 global_step=self._global_step,
             )
-            for sub in ("node", "rel", "rank"):
+            for sub in ("node", "rel"):
                 self.tensorboard.add_scalar(
                     f"loss/train/{sub}",
                     fwd[f"{sub}_loss"],

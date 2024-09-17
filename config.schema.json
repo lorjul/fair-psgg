@@ -250,11 +250,6 @@
     },
     "LossCfg": {
       "properties": {
-        "rank_weight": {
-          "default": 0.0,
-          "title": "Rank Weight",
-          "type": "number"
-        },
         "interpolate_weights": {
           "anyOf": [
             {

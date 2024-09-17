@@ -68,7 +68,7 @@ def inference2(
     for batch in split_batch_iter(tqdm(loader, unit="batch"), max_relations=512):
         # get pair ids
         model_input, sbj_target, obj_target, rel_target = prepare_batch(batch, device)
-        sbj_out, obj_out, rel_out, rel_ranking = model(model_input)
+        sbj_out, obj_out, rel_out = model(model_input)
 
         if apply_sigmoid:
             rel_out = rel_out.sigmoid()

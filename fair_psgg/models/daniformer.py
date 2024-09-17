@@ -213,13 +213,6 @@ class DaniFormer(nn.Module):
             nn.Linear(in_features=final_hidden_dim, out_features=num_rel_outputs),
         )
 
-        self.final_ranking_layers = nn.Sequential(
-            nn.Linear(in_features=self.embed_dim, out_features=final_hidden_dim),
-            nn.ReLU(),
-            # for ranking, we need one less output coefficient as for classification
-            nn.Linear(in_features=final_hidden_dim, out_features=num_rel_outputs - 1),
-        )
-
         self.final_node = nn.Linear(
             in_features=self.embed_dim, out_features=num_node_outputs * 2
         )
@@ -355,14 +348,7 @@ class DaniFormer(nn.Module):
             sbj_cls = node_output[:, half_len:]
             obj_cls = node_output[:, :half_len]
 
-        # relation ranking is probably useless and we don't want it to interfere with the rest of the model
-        # => call .detach() on all tensors and effectively train a second small MLP (rel_ranker)
-        if self.final_ranking_layers is None:
-            ranking = None
-        else:
-            ranking = self.final_ranking_layers(final_token.detach())
-
-        return sbj_cls, obj_cls, output, ranking
+        return sbj_cls, obj_cls, output
 
     def forward(self, data: dict, return_attention=None, max_relations=None):
         """
@@ -385,11 +371,10 @@ class DaniFormer(nn.Module):
             all_sc = []
             all_oc = []
             all_rel = []
-            all_rank = []
             for sb, ob in zip(
                 sbj_ids.split(max_relations), obj_ids.split(max_relations)
             ):
-                sc, oc, rel, rank = self._forward_internal(
+                sc, oc, rel = self._forward_internal(
                     data=data,
                     features=features,
                     patches=patches,
@@ -403,13 +388,10 @@ class DaniFormer(nn.Module):
                 if oc is not None:
                     all_oc.append(oc)
                 all_rel.append(rel)
-                if rank is not None:
-                    all_rank.append(rank)
             return (
                 torch.cat(all_sc) if all_sc else None,
                 torch.cat(all_oc) if all_oc else None,
                 torch.cat(all_rel),
-                torch.cat(all_rank) if all_rank else None,
             )
 
         return self._forward_internal(
