@@ -40,11 +40,6 @@
           "default": false,
           "title": "Encode Coords",
           "type": "boolean"
-        },
-        "classification_token": {
-          "default": true,
-          "title": "Classification Token",
-          "type": "boolean"
         }
       },
       "title": "ArchCfg_DaniFormer",
@@ -414,8 +409,7 @@
         "use_semantics": false,
         "use_masks": false,
         "bg_ratio_strategy": "sum",
-        "encode_coords": false,
-        "classification_token": true
+        "encode_coords": false
       }
     },
     "data": {

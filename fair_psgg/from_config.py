@@ -85,7 +85,6 @@ def get_model(config: Config, num_node_outputs: int, num_rel_outputs: int):
         use_masks=arch_cfg.use_masks,
         bg_ratio_strategy=arch_cfg.bg_ratio_strategy,
         encode_coords=arch_cfg.encode_coords,
-        use_classification_token=arch_cfg.classification_token,
     )
 
 

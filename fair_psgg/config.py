@@ -55,7 +55,6 @@ class ArchCfg_DaniFormer(BaseModel):
     use_masks: bool = False
     bg_ratio_strategy: Literal["sum", "onoff"] = "sum"
     encode_coords: bool = False
-    classification_token: bool = True
 
 
 class DataCfg(BaseModel):

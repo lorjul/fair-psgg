@@ -18,7 +18,6 @@
         "use_semantics": false,
         "use_masks": true,
         "bg_ratio_strategy": "sum",
-        "classification_token": true,
         "encode_coords": false
     },
     "data": {

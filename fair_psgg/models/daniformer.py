@@ -181,7 +181,6 @@ class DaniFormer(nn.Module):
         use_masks=False,
         bg_ratio_strategy="total",
         encode_coords=False,
-        use_classification_token=True,
     ):
         super().__init__()
         self.extractor = extractor
@@ -245,10 +244,7 @@ class DaniFormer(nn.Module):
         else:
             self.coord_embed = None
 
-        if use_classification_token:
-            self.classification_token = nn.Parameter(torch.rand(self.embed_dim))
-        else:
-            self.classification_token = None
+        self.classification_token = nn.Parameter(torch.rand(self.embed_dim))
 
         if use_semantics:
             self.freq_bias = FreqBias(
@@ -290,14 +286,9 @@ class DaniFormer(nn.Module):
             coords[:, 3] *= fh / h
             sbjobj_tokens = self.sbjobj_encoder(coords[sbj_ids], coords[obj_ids])
 
-        if self.classification_token is None:
-            extra_tokens = torch.empty(
-                (patches_per_box.size(0), 0, self.embed_dim), device=patches.device
-            )
-        else:
-            extra_tokens = self.classification_token[None, None].expand(
-                patches_per_box.size(0), 1, -1
-            )
+        extra_tokens = self.classification_token[None, None].expand(
+            patches_per_box.size(0), 1, -1
+        )
 
         # add frequency bias token if requested
         if self.freq_bias is not None:
@@ -329,12 +320,7 @@ class DaniFormer(nn.Module):
             for block in self.transformer_blocks:
                 tokens = block(tokens, pos_encoding=self.pos_encoding)
 
-        if self.classification_token is None:
-            # average the output from all tokens
-            final_token = tokens.mean(1)
-        else:
-            # use the output from the classification token
-            final_token = tokens[:, 0]
+        final_token = tokens[:, 0]
 
         output = self.final_layers(final_token)
 
