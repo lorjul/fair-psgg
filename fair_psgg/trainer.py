@@ -96,9 +96,7 @@ class Trainer:
             self.train_loader.dataset.count_nodes()
         ).to(self.device)
         self.rel_criterion = get_multi_rel_criterion(
-            self.train_loader.dataset.get_predicate_neg_ratio(),
-            # only divide by log(number of classes)
-            log=config.log_rel_class_weights,
+            self.train_loader.dataset.get_predicate_neg_ratio()
         ).to(self.device)
 
         if config.lr_backbone is None:
@@ -173,7 +171,6 @@ class Trainer:
             num_workers=num_workers,
             augmentations=from_config.get_augmentations(config, split="train"),
             neg_ratio=config.neg_ratio,
-            allow_overlapping_negatives=config.allow_overlapping_negatives,
         )
 
         self.val_loader = get_rel_loader(
@@ -186,8 +183,6 @@ class Trainer:
             batch_size=self.imgs_per_batch,
             num_workers=num_workers,
             augmentations=from_config.get_augmentations(config, split="val"),
-            # for validation, we want to look at all possible combinations
-            allow_overlapping_negatives=True,
         )
 
     def _common_forward(self, batch):

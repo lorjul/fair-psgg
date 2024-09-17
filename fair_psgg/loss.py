@@ -11,13 +11,8 @@ def get_node_criterion(num_samples: torch.Tensor):
     return nn.CrossEntropyLoss(weight=class_weights)
 
 
-def get_multi_rel_criterion(pos_neg_ratios: torch.Tensor, log=False):
-    if log:
-        inv = (1 / pos_neg_ratios + 1).log()
-    else:
-        inv = 1 / pos_neg_ratios
-    # pos_weights = inv / inv.mean()
-    pos_weights = inv
+def get_multi_rel_criterion(pos_neg_ratios: torch.Tensor):
+    pos_weights = 1 / pos_neg_ratios
     assert (pos_weights >= 0).all()
     return nn.BCEWithLogitsLoss(pos_weight=pos_weights)
 

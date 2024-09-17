@@ -6,12 +6,7 @@ from .data import get_loader
 from . import from_config
 
 
-def get_psg(
-    split: str = "val",
-    batch_size: int = 4,
-    neg_ratio: float = None,
-    allow_overlapping_negatives=True,
-):
+def get_psg(split: str = "val", batch_size: int = 4, neg_ratio: float = None):
     if neg_ratio is None and split == "train":
         neg_ratio = 2.0
     return get_loader(
@@ -23,7 +18,6 @@ def get_psg(
         num_workers=0,
         augmentations=from_config.get_augmentations(config=None, split=split),
         neg_ratio=neg_ratio,
-        allow_overlapping_negatives=allow_overlapping_negatives,
     )
 
 

@@ -43,8 +43,6 @@ def inference2(
         batch_size=batch_size,
         num_workers=num_workers,
         augmentations=from_config.get_augmentations(config, split="test"),
-        # for testing/inference, we want to look at all possible combinations
-        allow_overlapping_negatives=True,
     )
 
     model = from_config.get_model(

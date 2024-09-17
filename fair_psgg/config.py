@@ -80,8 +80,6 @@ class Config(BaseModel):
     weight_decay: float = 0.01
     neg_ratio: float = 1.0
     augmentations: Optional[_Augmentations] = None
-    allow_overlapping_negatives: bool = True
-    log_rel_class_weights: bool = False
     grad_accumulate: int = 1
 
     extractor: Union[

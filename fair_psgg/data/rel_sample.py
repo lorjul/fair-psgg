@@ -26,25 +26,12 @@ def _get_num_boxes(boxes: Union[int, torch.Tensor]):
 
 
 def _get_all_negative_pair_ids(
-    boxes: Union[int, torch.Tensor],
-    rel_targets: torch.Tensor,
-    allow_overlapping_negatives: bool,
+    boxes: Union[int, torch.Tensor], rel_targets: torch.Tensor
 ):
     num_boxes = _get_num_boxes(boxes)
 
-    if allow_overlapping_negatives:
-        # select all pairs
-        neg_pair_mask = torch.ones((num_boxes * (num_boxes - 1),), dtype=torch.bool)
-    else:
-        assert isinstance(boxes, torch.Tensor)
-        # select all pairs that have an IoU of 0
-        ious = (
-            box_iou(boxes, boxes)[~torch.eye(num_boxes, dtype=torch.bool)]
-            .view(num_boxes, num_boxes - 1)
-            .transpose(0, 1)
-            .flatten()
-        )
-        neg_pair_mask = ious == 0
+    # select all pairs
+    neg_pair_mask = torch.ones((num_boxes * (num_boxes - 1),), dtype=torch.bool)
 
     num_positives = len(rel_targets)
     # positive pairs must not be sampled
@@ -59,35 +46,25 @@ def _get_all_negative_pair_ids(
 
 
 def sample_one_negative_pair(
-    boxes: Union[int, torch.Tensor],
-    rel_targets: torch.Tensor,
-    allow_overlapping_negatives=True,
+    boxes: Union[int, torch.Tensor], rel_targets: torch.Tensor
 ):
     """Samples one single negative pair"""
     num_boxes = _get_num_boxes(boxes)
-    neg_pair_ids = _get_all_negative_pair_ids(
-        boxes, rel_targets, allow_overlapping_negatives
-    )
+    neg_pair_ids = _get_all_negative_pair_ids(boxes, rel_targets)
     idx = random.choice(neg_pair_ids).unsqueeze(0)
     return idx_to_sbjobj(idx, num_boxes)[0]
 
 
 def sample_negatives(
-    boxes: Union[int, torch.Tensor],
-    rel_targets: torch.Tensor,
-    neg_ratio: float,
-    allow_overlapping_negatives=True,
+    boxes: Union[int, torch.Tensor], rel_targets: torch.Tensor, neg_ratio: float
 ) -> torch.Tensor:
     """
     :param num_boxes: Number of boxes for the processed image
     :param rel_targets: List of relations as they come out of LoadAnnotation
     (sbj, obj, rel0, rel1, ...)
     :param neg_ratio: The sampling ratio
-    :param allow_overlapping_negatives: When set to False, only boxes that do not overlap can become negative samples.
     """
-    neg_pair_ids = _get_all_negative_pair_ids(
-        boxes, rel_targets, allow_overlapping_negatives
-    )
+    neg_pair_ids = _get_all_negative_pair_ids(boxes, rel_targets)
     num_boxes = _get_num_boxes(boxes)
 
     num_pos = len(rel_targets)

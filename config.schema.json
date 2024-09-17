@@ -357,16 +357,6 @@
       ],
       "default": null
     },
-    "allow_overlapping_negatives": {
-      "default": true,
-      "title": "Allow Overlapping Negatives",
-      "type": "boolean"
-    },
-    "log_rel_class_weights": {
-      "default": false,
-      "title": "Log Rel Class Weights",
-      "type": "boolean"
-    },
     "grad_accumulate": {
       "default": 1,
       "title": "Grad Accumulate",

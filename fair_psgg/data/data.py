@@ -105,7 +105,6 @@ class SGDataset(Dataset):
         seg_dir,
         augmentations: Sequence,
         neg_ratio=None,
-        allow_overlapping_negatives=True,
     ):
         """Creates a new SGDataset object
         :param is_train: Whether the dataset is for training data or not.
@@ -125,7 +124,6 @@ class SGDataset(Dataset):
         self.node_names = node_names
         self.rel_names = ["NONE"] + rel_names
         self.entries = entries
-        self.allow_overlapping_negatives = allow_overlapping_negatives
 
         assert len(self.entries) > 0, "Empty dataset"
 
@@ -175,7 +173,6 @@ class SGDataset(Dataset):
                 boxes=bboxes,
                 rel_targets=multi_targets,
                 neg_ratio=self.neg_ratio,
-                allow_overlapping_negatives=self.allow_overlapping_negatives,
             )
 
         # add the explicit label
@@ -228,7 +225,6 @@ def get_rel_loader(
     batch_size,
     num_workers,
     neg_ratio=None,
-    allow_overlapping_negatives=True,
 ):
     dataset = SGDataset(
         is_train=is_train,
@@ -239,7 +235,6 @@ def get_rel_loader(
         seg_dir=seg_dir,
         augmentations=augmentations,
         neg_ratio=neg_ratio,
-        allow_overlapping_negatives=allow_overlapping_negatives,
     )
     return get_generic_loader(
         dataset=dataset,
@@ -258,7 +253,6 @@ def get_loader(
     num_workers: int,
     augmentations,
     neg_ratio=None,
-    allow_overlapping_negatives=True,
 ):
     entries, node_names, rel_names = load_psg_entries(anno_path=anno_path, split=split)
     is_train = split == "train"
@@ -271,7 +265,6 @@ def get_loader(
         seg_dir=seg_dir,
         augmentations=augmentations,
         neg_ratio=neg_ratio,
-        allow_overlapping_negatives=allow_overlapping_negatives,
     )
     return get_generic_loader(
         dataset=dataset,
