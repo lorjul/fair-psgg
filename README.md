@@ -1,7 +1,5 @@
 # A Fair Ranking and New Model for Panoptic Scene Graph Generation
 
-**We are currently preparing this repo for the camera ready version. The current code may still contain some rough edges.**
-
 This is the official implementation of our paper "A Fair Ranking and New Model for Panoptic Scene Graph Generation", accepted at ECCV 2024. For more information, please visit the [project page](https://lorjul.github.io/fair-psgg/).
 
 ## Setup
