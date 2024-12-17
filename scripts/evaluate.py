@@ -569,16 +569,11 @@ def calc_metrics(
     # sum all counts, then average over all images
 
     for k in ks:
-        metrics[f"all_mR@{k}"] = hit_counts[k].sum(0) / gt_counts.sum(0)
-        metrics[f"all_mNgR@{k}"] = nogc_hit_counts[k].sum(0) / gt_counts.sum(0)
-
         # ignore division by zero errors (we use it to return NaNs that are skipped when averaging)
         with np.errstate(invalid="ignore"):
             # calculate score for each image, then average over all images
-            metrics[f"img_mR@{k}"] = np.nanmean(hit_counts[k] / gt_counts, axis=0)
-            metrics[f"img_mNgR@{k}"] = np.nanmean(
-                nogc_hit_counts[k] / gt_counts, axis=0
-            )
+            metrics[f"mR@{k}"] = np.nanmean(hit_counts[k] / gt_counts, axis=0)
+            metrics[f"mNgR@{k}"] = np.nanmean(nogc_hit_counts[k] / gt_counts, axis=0)
 
     recall_metrics = _make_recall_table(metrics, predicate_names)
 
@@ -586,16 +581,11 @@ def calc_metrics(
         return [v] + [pd.NA] * (num_rel + 1)
 
     for k in ks:
-        recall_metrics[f"all_R@{k}"] = _nanpad(hit_counts[k].sum() / gt_counts.sum())
-        recall_metrics[f"all_NgR@{k}"] = _nanpad(
-            nogc_hit_counts[k].sum() / gt_counts.sum()
-        )
-
         with np.errstate(invalid="ignore"):
-            recall_metrics[f"img_R@{k}"] = _nanpad(
+            recall_metrics[f"R@{k}"] = _nanpad(
                 np.nanmean(hit_counts[k].sum(1) / gt_counts.sum(1))
             )
-            recall_metrics[f"img_NgR@{k}"] = _nanpad(
+            recall_metrics[f"NgR@{k}"] = _nanpad(
                 np.nanmean(nogc_hit_counts[k].sum(1) / gt_counts.sum(1))
             )
 
